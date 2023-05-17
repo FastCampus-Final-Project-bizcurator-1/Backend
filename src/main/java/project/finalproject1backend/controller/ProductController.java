@@ -80,7 +80,7 @@ public class ProductController {
 
     @Tag(name = "관리자 페이지 (상품관련)", description = "관리자 페이지 (상품관련)")
     @Operation(summary = "상품등록 메서드", description = "상품등록 메서드입니다. (등록되어 있는 subcategory일 경우 product 등록, " +
-            "등록되어 있지 않은 subcategory일 경우 ,error 리턴 , id값은 안 보내도 됩니다.보내도 상관없음)",security ={ @SecurityRequirement(name = "bearer-key") })
+            "등록되어 있지 않은 subcategory일 경우 ,error 리턴 , id값은 안보내도 됩니다.id값 상관없음)",security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
