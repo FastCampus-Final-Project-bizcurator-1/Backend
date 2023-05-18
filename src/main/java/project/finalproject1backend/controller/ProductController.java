@@ -94,7 +94,7 @@ public class ProductController {
     }
 
     @Tag(name = "관리자 페이지 (상품관련)", description = "관리자 페이지 (상품관련)")
-    @Operation(summary = "추천 TRUE/FALSE 변경 메서드", description = "추천변경 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @Operation(summary = "추천 TRUE/FALSE 변경 메서드", description = "추천변경가능하며, 만약 추천상품이 5개이상이면 에러처리 하는메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
@@ -104,6 +104,9 @@ public class ProductController {
                                                    @PathVariable Long productId) {
         return productService.setProductRecommended(principal,productId);
     }
+
+
+
 
 
 

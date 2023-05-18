@@ -121,7 +121,7 @@ public class ProductService {
                 attachmentFileRepository.delete(existingImage);
             }
 
-            
+
             // 이미지 수정
             for (MultipartFile m: productImgFileList){
                 UploadDTO uploadDTO = uploadUtil.upload(m,path);
@@ -180,12 +180,21 @@ public class ProductService {
 
         Optional<Product> optionalProduct = productRepository.findById(productId);
 
+        // 해당 상품이 존재하면
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
-            product.setRecommended(true);
-            productRepository.save(product);
-
-            return ResponseEntity.ok().build();
+            if (product.isRecommended()) {
+                return ResponseEntity.badRequest().body("이미 해당 상품은 추천상품으로 설정되어 있습니다.");
+            } else {
+                int recommendedCount = productRepository.countByRecommendedTrue();
+                if (recommendedCount >= 5) {
+                    return ResponseEntity.badRequest().body("이미 5개의 추천상품이 등록되었습니다.");
+                } else {
+                    product.setRecommended(true);
+                    productRepository.save(product);
+                    return ResponseEntity.ok().build();
+                }
+            }
         }
 
         return ResponseEntity.notFound().build();

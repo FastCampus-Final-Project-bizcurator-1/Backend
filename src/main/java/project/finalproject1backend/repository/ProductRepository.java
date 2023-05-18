@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     boolean existsById(Long id); //아이디 중복확인
     Optional<Product> findById(Long id); //아이디로 찾기
 
+    int countByRecommendedTrue();
 
 
     //상품명으로 검색
