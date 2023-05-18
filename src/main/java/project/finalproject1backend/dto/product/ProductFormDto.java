@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -66,6 +67,9 @@ public class ProductFormDto {
     @NotBlank(message = "추천 기본값은 FALSE 입니다.")
     private  boolean isRecommended; // 추천여부
 
+    @NotBlank(message = "추천 이미지값은 필수 입력 항목 입니다.")
+    private List<String> imageUrls; //이미지
+
 
     private static ModelMapper modelMapper = new ModelMapper();
 
@@ -79,7 +83,13 @@ public class ProductFormDto {
 //    }
 
 
+
+
     public static ProductFormDto of(Product product) {
+        List<String> imageUrls = product.getImgList().stream()
+                .map(attachmentFile -> attachmentFile.getFilePath() + attachmentFile.getFileName())
+                .collect(Collectors.toList());
+
         return ProductFormDto.builder()
                 .id(product.getId())
                 .productName(product.getProductName())
@@ -95,6 +105,7 @@ public class ProductFormDto {
                 .subcategory(product.getProductSubcategory().getName())
                 .message(product.getMessage())
                 .isRecommended(product.isRecommended())
+                .imageUrls(imageUrls)
                 .build();
     }
 
@@ -106,7 +117,16 @@ public class ProductFormDto {
         @Setter public int consumerPrice;   //소비자가
         @Setter public int productPrice;   //판매가
         @Setter public boolean isRecommended; // 추천상품여부
+        @Setter public String imageUrl;
     }
 
+
+    public static class ProductRandomResponseDto {
+        @Setter private Long id;
+        @Setter public String productName;   //상품명
+        @Setter public int productPrice;   //판매가
+        @Setter public int minimumQuantity;     //최소수량
+        @Setter public String imageUrl;
+    }
 
 }

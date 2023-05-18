@@ -149,17 +149,18 @@ public class ProductController {
          return productService.getAllProducts(pageable);
     }
 
-//    @Tag(name = "API 상품조회", description = "상품 조회 api 입니다.")
-//    @Operation(summary = "상품 랜덤 5개조회 메서드", description = "상품 랜덤 5개조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
-//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-//    })
-//    @GetMapping("/account/products/random")
-//    public ResponseEntity<List<Product>> getProductByRandom(@RequestParam("subCategory") String subCategory) {
-//
-//        return productService.getProductByRandom(subCategory);
-//    }
+    @Tag(name = "API 상품조회", description = "상품 조회 api 입니다.")
+    @Operation(summary = "상품 카테고리별 랜덤 4개조회 메서드", description = "같은 카테고리별 랜덤 4개조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.ProductRandomResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/account/products/random")
+    public ResponseEntity<?> getProductByRandom
+            (@RequestParam("mainCategory") MainCategory mainCategory) {
+
+        return productService.getProductByRandom(mainCategory);
+    }
 
     @Tag(name = "API 상품조회", description = "상품 조회 api 입니다.")
     @Operation(summary = "상품id별 상세 조회 메서드", description = "상품 상세 조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })

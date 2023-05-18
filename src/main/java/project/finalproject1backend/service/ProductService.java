@@ -22,10 +22,7 @@ import project.finalproject1backend.util.UploadUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,11 +99,7 @@ public class ProductService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    //            List<Long> productImgIds = productFormDto.getProductImgIds();
-//
-//            for (int i = 0; i < itemImgFileList.size(); i++) {
-//                productImgService.updateProductImg(productImgIds.get(i), itemImgFileList.get(i));
-//            }
+
     public ResponseEntity<?> modify(PrincipalDTO principal, ProductFormDto productFormDto, List<MultipartFile> productImgFileList) throws Exception{
         Optional<User> user=userRepository.findById(principal.getId());
         if(!user.isPresent()){
@@ -167,21 +160,7 @@ public class ProductService {
         return ResponseEntity.ok(products.map(ProductFormDto::of));
     }
 
-//    public ResponseEntity<List<Product>> getProductsByCategory(MainCategory mainCategory, String subCategoryName) {
-//        List<Product> products = new ArrayList<>();
-//
-//        if (StringUtils.hasText(subCategoryName)) {
-//            products = productRepository.findByMainCategoryAndSubCategoryName(mainCategory, subCategoryName);
-//        } else {
-//            products = productRepository.findByMainCategory(mainCategory);
-//        }
-//        return new ResponseEntity<>(products, HttpStatus.OK);
-//    }
-//
-//    public ResponseEntity<List<Product>> getProductByRandom(String subCategory) {
-//        List<Product> products = subCategoryRepository.findRandomProductsBySubCategory(subCategory);
-//        return new ResponseEntity<>(products, HttpStatus.OK);
-//    }
+
 
 
     public ResponseEntity<?> getProduct(Long productId) {
@@ -224,10 +203,50 @@ public class ProductService {
             responseDto.setConsumerPrice(product.getConsumerPrice());
             responseDto.setProductPrice(product.getProductPrice());
             responseDto.setRecommended(product.isRecommended());
+            if (!product.getImgList().isEmpty()) {
+                AttachmentFile attachmentFile = product.getImgList().get(0); // 첫 번째 이미지 사용
+                responseDto.setImageUrl(attachmentFile.getFilePath() + attachmentFile.getFileName());
+            }
 
             responseDtos.add(responseDto);
         }
 
         return ResponseEntity.ok(responseDtos);
     }
+
+    public ResponseEntity<?>getProductByRandom(MainCategory mainCategory) {
+        // 전체 상품 조회
+        List<Product> products = productRepository.findAll();
+
+        // 요청된 메인 카테고리와 일치하는 상품 필터링
+        List<Product> filteredProducts = products.stream()
+                .filter(product -> product.getMainCategory().equals(mainCategory))
+                .collect(Collectors.toList());
+        // 랜덤으로 4개 상품 선택
+        Collections.shuffle(filteredProducts);
+        List<Product> randomProducts = filteredProducts.stream()
+                .limit(4)
+                .collect(Collectors.toList());
+        // ProductRandomResponseDto로 변환하여 반환
+        List<ProductFormDto.ProductRandomResponseDto> responseDtos = randomProducts.stream()
+                .map(product -> {
+                    ProductFormDto.ProductRandomResponseDto responseDto = new ProductFormDto.ProductRandomResponseDto();
+                    responseDto.setId(product.getId());
+                    responseDto.setProductName(product.getProductName());
+                    responseDto.setProductPrice(product.getProductPrice());
+                    responseDto.setMinimumQuantity(product.getMinimumQuantity());
+
+                    if (!product.getImgList().isEmpty()) {
+                        AttachmentFile attachmentFile = product.getImgList().get(0); // 첫 번째 이미지 사용
+                        responseDto.setImageUrl(attachmentFile.getFilePath() + attachmentFile.getFileName());
+                    }
+
+                    return responseDto;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseDtos);
+    }
+
+
 }
+
