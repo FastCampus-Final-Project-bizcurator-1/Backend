@@ -120,6 +120,8 @@ public class ProductService {
                 // 기존 이미지 삭제 로직 (예: 파일 시스템에서 이미지 파일 삭제)
                 attachmentFileRepository.delete(existingImage);
             }
+
+            
             // 이미지 수정
             for (MultipartFile m: productImgFileList){
                 UploadDTO uploadDTO = uploadUtil.upload(m,path);
