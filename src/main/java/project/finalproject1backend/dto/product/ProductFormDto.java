@@ -111,7 +111,7 @@ public class ProductFormDto {
 
 
 
-
+    //상품 상세
     public static class ProductResponseDto {
         @Setter public String productName;   //상품명
         @Setter public int consumerPrice;   //소비자가
@@ -120,7 +120,7 @@ public class ProductFormDto {
         @Setter public String imageUrl;
     }
 
-
+    //랜덤 상품
     public static class ProductRandomResponseDto {
         @Setter private Long id;
         @Setter public String productName;   //상품명
@@ -129,4 +129,33 @@ public class ProductFormDto {
         @Setter public String imageUrl;
     }
 
+    public static class ProductNameResponseDto {
+
+        @Setter public String productName;   //상품명
+        @Setter public ProductStatus productStatus; //상품상태
+        @Setter public int productPrice;   //판매가
+
+        public static ProductNameResponseDto of(Product product) {
+            ProductNameResponseDto dto = new ProductNameResponseDto();
+            dto.setProductName(product.getProductName());
+            dto.setProductStatus(product.getProductStatus());
+            dto.setProductPrice(product.getProductPrice());
+            return dto;
+        }
+    }
+
+    public static class ProductNameAndImgResponseDto {
+
+        @Setter public String productName;   //상품명
+        @Setter public ProductStatus productStatus; //상품상태
+        @Setter public int productPrice;   //판매가
+
+        public static ProductNameResponseDto of(Product product) {
+            ProductNameResponseDto dto = new ProductNameResponseDto();
+            dto.setProductName(product.getProductName());
+            dto.setProductStatus(product.getProductStatus());
+            dto.setProductPrice(product.getProductPrice());
+            return dto;
+        }
+    }
 }

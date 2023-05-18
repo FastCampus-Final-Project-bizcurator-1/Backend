@@ -93,22 +93,6 @@ public class ProductController {
         return productService.createProduct(principal,productDto, itemImgFileList);
     }
 
-    @Tag(name = "관리자 페이지 (상품관련)", description = "관리자 페이지 (상품관련)")
-    @Operation(summary = "추천 TRUE/FALSE 변경 메서드", description = "추천변경가능하며, 만약 추천상품이 5개이상이면 에러처리 하는메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @PostMapping("/account/admin/recommended/{productId}")
-    public ResponseEntity<?> setProductRecommended(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal,
-                                                   @PathVariable Long productId) {
-        return productService.setProductRecommended(principal,productId);
-    }
-
-
-
-
-
 
     @Tag(name = "API 상품", description = "상품 api 입니다.")
     @Operation(summary = "상품수정 메서드", description = "상품수정 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
@@ -135,6 +119,18 @@ public class ProductController {
         return productService.delete(principal,productId);
     }
 
+
+//    @Tag(name = "관리자 페이지 (상품관련)", description = "관리자 페이지 (상품관련)")
+//    @Operation(summary = "추천 TRUE/FALSE 변경 메서드", description = "추천변경가능하며, 만약 추천상품이 5개이상이면 에러처리 하는메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @PostMapping("/account/admin/recommended/{productId}")
+//    public ResponseEntity<?> setProductRecommended(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal,
+//                                                   @PathVariable Long productId) {
+//        return productService.setProductRecommended(principal,productId);
+//    }
 
     @Tag(name = "API 상품조회", description = "상품 조회 api 입니다.")
     @Operation(summary = "상품 전체항목 조회 메서드", description = "상품 전체 조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
@@ -183,8 +179,42 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @GetMapping("/account/products/summary")
-    public ResponseEntity<?> getProductDetails() {
-        return productService.getProductDetails();
+    public ResponseEntity<?> getProductDetails(@Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}") @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return productService.getProductDetails(pageable);
+    }
+
+    @Tag(name = "API 상품조회", description = "상품명 검색조회 api 입니다.")
+    @Operation(summary = "상품명 검색(이미지x)  메서드", description = "상품명 검색(상품명,노출상태,가격)메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.ProductNameResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/account/products/search/summary")
+    public ResponseEntity<?> getProductNameSummary(@Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}") @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam("productName") String productName) {
+        return productService.getProductNameSummary(pageable,productName);
+    }
+
+    @Tag(name = "API 상품조회", description = "상품명 검색조회 api 입니다.")
+    @Operation(summary = "상품명 검색 메서드", description = "상품명 검색 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/account/products/search/name")
+    public ResponseEntity<?> getProductName(@Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}") @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam("productName") String productName) {
+        return productService.getProductName(pageable,productName);
     }
 
 

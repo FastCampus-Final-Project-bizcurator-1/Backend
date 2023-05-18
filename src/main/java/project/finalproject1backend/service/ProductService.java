@@ -2,6 +2,7 @@ package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -173,36 +174,36 @@ public class ProductService {
         return ResponseEntity.ok(productFormDto);
     }
 
-    public ResponseEntity<?> setProductRecommended(PrincipalDTO principal, Long productId) {
-        if (!principal.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+//    public ResponseEntity<?> setProductRecommended(PrincipalDTO principal, Long productId) {
+//        if (!principal.getRole().equals("ADMIN")) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        Optional<Product> optionalProduct = productRepository.findById(productId);
+//
+//        // 해당 상품이 존재하면
+//        if (optionalProduct.isPresent()) {
+//            Product product = optionalProduct.get();
+//            if (product.isRecommended()) {
+//                return ResponseEntity.badRequest().body("이미 해당 상품은 추천상품으로 설정되어 있습니다.");
+//            } else {
+//                int recommendedCount = productRepository.countByRecommendedTrue();
+//                if (recommendedCount >= 5) {
+//                    return ResponseEntity.badRequest().body("이미 5개의 추천상품이 등록되었습니다.");
+//                } else {
+//                    product.setRecommended(true);
+//                    productRepository.save(product);
+//                    return ResponseEntity.ok().build();
+//                }
+//            }
+//        }
+//
+//        return ResponseEntity.notFound().build();
+//    }
 
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-
-        // 해당 상품이 존재하면
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
-            if (product.isRecommended()) {
-                return ResponseEntity.badRequest().body("이미 해당 상품은 추천상품으로 설정되어 있습니다.");
-            } else {
-                int recommendedCount = productRepository.countByRecommendedTrue();
-                if (recommendedCount >= 5) {
-                    return ResponseEntity.badRequest().body("이미 5개의 추천상품이 등록되었습니다.");
-                } else {
-                    product.setRecommended(true);
-                    productRepository.save(product);
-                    return ResponseEntity.ok().build();
-                }
-            }
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-    public ResponseEntity<?> getProductDetails() {
+    public ResponseEntity<?> getProductDetails(Pageable pageable) {
         // 전체 상품 조회
-        List<Product> products = productRepository.findAll();
+        Page<Product> products = productRepository.findAll(pageable);
 
         // 상품 정보를 포함하는 리스트 생성
         List<ProductFormDto.ProductResponseDto> responseDtos = new ArrayList<>();
@@ -225,6 +226,7 @@ public class ProductService {
         return ResponseEntity.ok(responseDtos);
     }
 
+    // 메인 카테고리별 랜덤 상품 조회
     public ResponseEntity<?>getProductByRandom(MainCategory mainCategory) {
         // 전체 상품 조회
         List<Product> products = productRepository.findAll();
@@ -258,6 +260,26 @@ public class ProductService {
         return ResponseEntity.ok(responseDtos);
     }
 
+    // 상품 이름으로 상품의 일부항목 조회
+    public ResponseEntity<?> getProductNameSummary(Pageable pageable,String productName) {
+        Page<Product> productList = productRepository.findByProductNameContaining(pageable,productName);
 
+        List<ProductFormDto.ProductNameResponseDto> responseDtoList = productList.stream()
+                .map(ProductFormDto.ProductNameResponseDto::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseDtoList);
+    }
+
+    // 상품 이름으로 상품의 전체항목 조회
+    public ResponseEntity<?> getProductName(Pageable pageable,String productName) {
+        Page<Product> productList = productRepository.findByProductNameContaining(pageable,productName);
+
+        List<ProductFormDto> responseDtoList = productList.stream()
+                .map(ProductFormDto::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseDtoList);
+    }
 }
 
