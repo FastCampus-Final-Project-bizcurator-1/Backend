@@ -10,6 +10,8 @@ import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.domain.Product;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.dto.Order.OrderCartRequestDTO;
+import project.finalproject1backend.dto.Order.OrderItemResponseDTO;
+import project.finalproject1backend.dto.Order.OrderPriceResponseDTO;
 import project.finalproject1backend.dto.Order.OrderRequestDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
@@ -176,5 +178,39 @@ public class OrderService {
         String orderNumString = now.format(formatter) + String.format("%02d",userId) + String.format("%02d",orderId);
 
         return Long.parseLong(orderNumString);
+    }
+
+    public ResponseEntity<?> OrderItemResponse(PrincipalDTO principal, List<Long> cartItemIds) { // 주문 상품 정보 제공
+        List<OrderItemResponseDTO> orderItemResponseDTOS = new ArrayList<>();
+
+        for (Long i :
+                cartItemIds) {
+            orderItemResponseDTOS.add(new OrderItemResponseDTO(cartItemRepository.findById(i).get()));
+        }
+
+        return new ResponseEntity<>(orderItemResponseDTOS, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<?> OrderPriceResponse(PrincipalDTO principal, List<Long> cartItemIds) {
+
+            int sum = 0;
+            int charge = 0;
+
+        for (Long i :
+        cartItemIds) {
+            Optional<CartItem> cartItem= cartItemRepository.findById(i);
+
+            if(!cartItem.isPresent()){ // 카트아이템 검사
+                throw new IllegalArgumentException("Check CartItem");
+            }
+            if(cartItem.get().getProduct() == null){ // 상품 검사
+                throw new IllegalArgumentException("Check Product");
+            }
+
+            sum += cartItem.get().getProduct().getConsumerPrice()*cartItem.get().getCount();
+            charge += cartItem.get().getProduct().getDeliveryCharge(); // ((((((배송비 계산 갯수당???)))))))
+        }
+        return new ResponseEntity<>(new OrderPriceResponseDTO(sum,charge,sum+charge),HttpStatus.OK);
     }
 }
