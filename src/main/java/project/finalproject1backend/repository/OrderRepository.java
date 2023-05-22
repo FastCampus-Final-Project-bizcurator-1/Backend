@@ -16,5 +16,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     @Query("SELECT o FROM Orders o WHERE YEAR(o.createdAt) = :year AND MONTH(o.createdAt) = :month")
     List<Orders> findByCreatedAt(@Param("year") int year, @Param("month") int month);
+    Optional<Orders> findByNumber(String number);
+    Optional<Orders> findByPgUid(String pgUid);
 
 }
