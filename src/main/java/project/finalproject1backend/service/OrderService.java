@@ -5,16 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.finalproject1backend.domain.CartItem;
-import project.finalproject1backend.domain.Orders;
-import project.finalproject1backend.domain.Product;
-import project.finalproject1backend.domain.User;
-import project.finalproject1backend.dto.Order.OrderCartRequestDTO;
-import project.finalproject1backend.dto.Order.OrderItemResponseDTO;
-import project.finalproject1backend.dto.Order.OrderPriceResponseDTO;
-import project.finalproject1backend.dto.Order.OrderRequestDTO;
+import project.finalproject1backend.domain.*;
+import project.finalproject1backend.dto.Order.*;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
+import project.finalproject1backend.repository.OrderItemRepository;
 import project.finalproject1backend.repository.OrderRepository;
 import project.finalproject1backend.repository.ProductRepository;
 import project.finalproject1backend.repository.UserRepository;
@@ -38,10 +33,10 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     private final CartItemRepository cartItemRepository;
+    private final OrderItemRepository orderItemRepository;
 
     //바로 구매(개별 주문)
     public ResponseEntity<ResponseDTO> purchaseOne(PrincipalDTO principal, OrderRequestDTO orderRequestDTO){
-
         String userId = principal.getUserId();
         Optional<User> optionalUser = userRepository.findByUserId(userId);
         Optional<Product> optionalProduct = productRepository.findById(orderRequestDTO.getProductId());
@@ -53,15 +48,13 @@ public class OrderService {
        throw new IllegalArgumentException("User ID");
        }
 
-        if(price <= 0){throw new IllegalArgumentException("Price is Equal or Under 0");} // 결제 금액이 0원 이하인 경우
-
        if(optionalUser.isPresent()){ // 유저 확인
        }else{
            throw new IllegalArgumentException("product ID");
        }
 
            optionalProduct.get().removeStock(orderRequestDTO.getCount()); // 재고 차감 (유효성 검사 겸용)
-           createOrder(principal, orderRequestDTO, price); // 주문 생성
+           createOrder(principal, orderRequestDTO, optionalProduct.get()); // 주문 생성
 
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
@@ -112,7 +105,7 @@ public class OrderService {
     }
 
 
-    private void createOrder(PrincipalDTO principal, OrderRequestDTO orderRequestDTO, int price) { // 오더 생성
+    private void createOrder(PrincipalDTO principal, OrderRequestDTO orderRequestDTO, Product product) { // 개별 주문에 대한 오더 생성
         String userId = principal.getUserId();
         Optional<User> optionalUser = userRepository.findByUserId(userId);
 
@@ -124,11 +117,13 @@ public class OrderService {
         String deliveryAddress = orderRequestDTO.getDeliveryAddress();
         String deliveryDetailedAddress = orderRequestDTO.getDeliveryDetailedAddress();
 
+        if(product.getConsumerPrice()*orderRequestDTO.getCount() + product.getDeliveryCharge() <= 0){ // 결제 요금이 0원인 경우
+            throw new IllegalArgumentException("Price is Equal or Under 0");
+        }
 
         Orders order = new Orders();
         orderRepository.save(order); // 아래의 getId 사용을 위해 한번 저장
         order.setUser(optionalUser.get());
-        order.setTotalPrice(price);
         order.setPaymentMethod(paymentMethod);
         order.setNumber(createNumber(optionalUser.get().getId(), order.getId()));
         order.setDeliveryName(deliveryName);
@@ -139,6 +134,10 @@ public class OrderService {
         order.setDeliveryDetailedAddress(deliveryDetailedAddress);
         order.setStatus(PURCHASING);
         orderRepository.save(order);
+
+        OrderItems orderItems = new OrderItems(product, order);
+        order.setTotalPrice(orderItems.getConsumerPrice()*orderRequestDTO.getCount() + orderItems.getDeliveryCharge());
+
     }
     private void createCartOrder(PrincipalDTO principal, OrderCartRequestDTO orderCartRequestDTO, int price) { // 장바구니 상품에 대한 오더 생성 ( 리팩토링 필요 )
         String userId = principal.getUserId();
@@ -213,4 +212,28 @@ public class OrderService {
         }
         return new ResponseEntity<>(new OrderPriceResponseDTO(sum,charge,sum+charge),HttpStatus.OK);
     }
+
+    public ResponseEntity<?> getOrderList(PrincipalDTO principal, OrderListRequestDTO requestDTO) { // 관리자 주문 조회
+        List<OrderListResponseDTO> orderListResponseDTOS = new ArrayList<>();
+        List<Orders> orders = orderRepository.findByCreatedAt(requestDTO.getYear(), requestDTO.getMonth());
+
+        if(orders.size() <= 0){
+            throw new IllegalArgumentException("Not Found Orders");
+        }
+        for (Orders i :
+                orders) {
+            orderListResponseDTOS.add(new OrderListResponseDTO(i));
+        }
+        return new ResponseEntity<>(orderListResponseDTOS,HttpStatus.OK);
+    }
+
+//    public ResponseEntity<?> getOrderListUser(PrincipalDTO principal) {
+//        List<Orders> orders = new ArrayList<>();
+//        orders.add(orderRepository.findById(principal.getId()).get());
+//
+//        for (Orders i :
+//                orders) {
+//
+//        }
+//    }
 }

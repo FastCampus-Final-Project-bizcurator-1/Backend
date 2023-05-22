@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @ToString
@@ -66,6 +67,8 @@ public class Orders extends AuditingFields {
     @Setter
     private String pgUid; // 결제사 uid
 
+    @OneToMany(mappedBy = "orders")
+    private List<OrderItems> orderItems;
 
     public void setUser(User user){ this.user = user;}
 

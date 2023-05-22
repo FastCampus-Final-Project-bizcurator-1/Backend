@@ -14,9 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import project.finalproject1backend.dto.ErrorDTO;
-import project.finalproject1backend.dto.Order.OrderCartRequestDTO;
-import project.finalproject1backend.dto.Order.OrderItemResponseDTO;
-import project.finalproject1backend.dto.Order.OrderRequestDTO;
+import project.finalproject1backend.dto.Order.*;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.service.OrderService;
@@ -80,5 +78,29 @@ public class OrderController {
                                                @RequestParam List<Long> cartItemIds){
         return orderService.OrderPriceResponse(principal,cartItemIds);
     }
+
+    @Tag(name = "API 관리자 페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "주문 월별 조회 API", description = "연,월에 따라 주문 목록을 확인하는 API입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = OrderListResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/account/admin/getOrder")
+    public ResponseEntity<?> getOrderListAdmin(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal,
+                                               @RequestBody @Valid OrderListRequestDTO requestDTO,
+                                               BindingResult bindingResult){
+        return orderService.getOrderList(principal,requestDTO);
+    }
+
+//    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+//    @Operation(summary = "주문 내역 조회 API", description = "유저의 주문 목록을 조회하는 API입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = OrderListUserResponseDTO.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @GetMapping("/account/admin/order")
+//    public ResponseEntity<?> getOrderListUser(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal){
+//        return orderService.getOrderListUser(principal);
+//    }
 
 }
