@@ -66,7 +66,7 @@ public class Product extends AuditingFields{
     private ProductStatus productStatus;  //판매상태
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     @Setter
     private MainCategory mainCategory;  //대분류
 

@@ -26,7 +26,7 @@ public class SubCategory extends AuditingFields {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "main_category", nullable = false, length = 20)
+    @Column(name = "main_category", nullable = false, length = 50)
     private MainCategory mainCategory;
 
     @JsonIgnore

@@ -57,7 +57,7 @@ public class BuyInquiryResponseDTO {
             this.buyImageList = b.getBuyImageList().stream().map(AttachmentDTO::new).toList();
         }
         if(!(b.getAnswerAttachmentList()==null||b.getAnswerAttachmentList().isEmpty())) {
-            this.buyImageList = b.getAnswerAttachmentList().stream().map(AttachmentDTO::new).toList();
+            this.answerAttachmentList = b.getAnswerAttachmentList().stream().map(AttachmentDTO::new).toList();
         }
         this.content = b.getContent();
         this.estimateWishDate = b.getEstimateWishDate();

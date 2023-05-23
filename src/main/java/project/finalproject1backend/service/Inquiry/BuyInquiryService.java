@@ -43,10 +43,8 @@ public class BuyInquiryService {
     private final AttachmentFileRepository attachmentFileRepository;
 
     private final UploadUtil uploadUtil;
-
-//    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
-
-    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
+    private String s3url="https://final-projcet-1.s3.ap-northeast-2.amazonaws.com/";
+    private String path = "FinalProject/upload/inquiry/";  // 배포용
 
     public ResponseEntity<?> buyInquiryCreat(BuyInquiryDTO requestDTO, List<MultipartFile> buyImageList, PrincipalDTO principal) {
 
@@ -77,11 +75,11 @@ public class BuyInquiryService {
         }
 
         for (MultipartFile m : buyImageList) {
-            UploadDTO uploadDTO = uploadUtil.upload(m, path);
+            UploadDTO uploadDTO = uploadUtil.upload(m, path,false);
 
             attachmentFileRepository.save(AttachmentFile.builder()
                     .fileName(uploadDTO.getFileName())
-                    .filePath(path)
+                    .filePath(s3url+path)
                     .originalFileName(uploadDTO.getOriginalName())
                     .thumbFileName(uploadDTO.getThumbFileName())
                     .buyImage(buyInquiry)
@@ -140,11 +138,11 @@ public class BuyInquiryService {
         }
 
         for (MultipartFile m : answerAttachmentList) {
-            UploadDTO uploadDTO = uploadUtil.upload(m, path);
+            UploadDTO uploadDTO = uploadUtil.upload(m, path,false);
 
             attachmentFileRepository.save(AttachmentFile.builder()
                     .fileName(uploadDTO.getFileName())
-                    .filePath(path)
+                    .filePath(s3url+path)
                     .originalFileName(uploadDTO.getOriginalName())
                     .thumbFileName(uploadDTO.getThumbFileName())
                     .answerAttachment(buyInquiry.get())

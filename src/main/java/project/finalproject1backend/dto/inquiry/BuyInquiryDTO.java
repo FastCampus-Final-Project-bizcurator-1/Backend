@@ -1,5 +1,6 @@
 package project.finalproject1backend.dto.inquiry;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,13 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BuyInquiryDTO {
-
+    @Schema(defaultValue = "대량구매")
     private String category;
-
+    @Schema(defaultValue = "상품이름")
     private String product;
 
     private int amount;
-
+    @Schema(defaultValue = "요청사항")
     private String content;
 
     private LocalDate estimateWishDate;
