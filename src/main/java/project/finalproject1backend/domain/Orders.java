@@ -3,6 +3,9 @@ package project.finalproject1backend.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @ToString
@@ -47,19 +50,25 @@ public class Orders extends AuditingFields {
     private String deliveryDetailedAddress; // 상세 주소
 
     @Setter
-    private String deliveryCompany; // 배송사
-
-    @Setter
     private int deliveryCharge; // 배송비
 
     @Setter
-    private long deliveryNumber; //
+    private String deliveryCompany; // 배송사
 
     @Setter
-    private OrderStatus status; // 주문 상태
+    private long deliveryNumber; //송장 번호
 
     @Setter
-    private String pgUid; // pg사 주문 번호
+    private LocalDate deadline; // 구매 확정 기한
+
+    @Setter
+    private OrderStatus status; // 상태
+
+    @Setter
+    private String pgUid; // 결제사 uid
+
+    @OneToMany(mappedBy = "orders")
+    private List<OrderItems> orderItems;
 
     public void setUser(User user){ this.user = user;}
 
