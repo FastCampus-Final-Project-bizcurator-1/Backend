@@ -30,14 +30,12 @@ public class ProductService {
     private final SubCategoryRepository subCategoryRepository;
     private final AttachmentFileRepository attachmentFileRepository;
     private final ProductRepository productRepository;
-//    private final ProductImgService productImgService;
-//    private final ProductImgRepository productImgRepository;
     private final UploadUtil uploadUtil;
+    private String s3url="https://final-projcet-1.s3.ap-northeast-2.amazonaws.com/";
+    private String path = "FinalProject/upload/product/";
 
-//    private String path = "C:\\upload";  //로컬 테스트용
-    private String path = "/home/ubuntu/FinalProject/upload/product";  // 배포용
     public ResponseEntity<?> createSubCategory(SubCategoryRequestDTO requestDTO){
-        String[] subcategoryList = requestDTO.getSubCategoryName().split(",");
+        String[] subcategoryList = requestDTO.getSubCategoryName().replace(" ","").split(",");
         for (String s: subcategoryList) {
             if(!subCategoryRepository.findByName(s).isPresent()) {
                 SubCategory subCategory = SubCategory.builder()
@@ -57,7 +55,7 @@ public class ProductService {
         for (SubCategory s:subCategories) {
             result.add(s.getName());
         }
-        return new ResponseEntity<>(new SubCategoryResponseDTO(result.toString().replace("["," ").replace("]"," ").strip()),HttpStatus.OK);
+        return new ResponseEntity<>(new SubCategoryResponseDTO(result.toString().replace("["," ").replace("]"," ").replace(" ","").strip()),HttpStatus.OK);
 
     }
     public ResponseEntity<?> createProduct(PrincipalDTO principal, ProductFormDto productDto, List<MultipartFile> productImgFileList) throws Exception {
@@ -85,11 +83,11 @@ public class ProductService {
 //            productImgService.saveItemImg(productImg, productImgFileList.get(i));
 //        }
         for (MultipartFile m: productImgFileList) {
-            UploadDTO uploadDTO = uploadUtil.upload(m,path);
+            UploadDTO uploadDTO = uploadUtil.upload(m,path,true);
 
             attachmentFileRepository.save(AttachmentFile.builder()
                     .fileName(uploadDTO.getFileName())
-                    .filePath(path)
+                    .filePath(s3url+path)
                     .originalFileName(uploadDTO.getOriginalName())
                     .thumbFileName(uploadDTO.getThumbFileName())
                     .productAttachment(product)

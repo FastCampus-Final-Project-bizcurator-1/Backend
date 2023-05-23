@@ -26,7 +26,7 @@ public class UploadController {
 
         List<UploadDTO> result = new ArrayList<>();
         for (MultipartFile i: multipartFiles){
-            result.add(attachmentUtil.upload(i,path));
+            result.add(attachmentUtil.upload(i,path,false));
 
         }
         return new ResponseEntity<>(result, HttpStatus.OK);

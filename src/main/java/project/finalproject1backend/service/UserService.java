@@ -42,7 +42,8 @@ public class UserService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
+    private String s3url="https://final-projcet-1.s3.ap-northeast-2.amazonaws.com/";
+    private String path = "FinalProject/upload/users/";  // 배포용
 
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO, List<MultipartFile> businessLicense){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
@@ -65,10 +66,10 @@ public class UserService {
         userRepository.save(user);
         if(!(businessLicense==null || businessLicense.isEmpty())){
             for (MultipartFile i: businessLicense){
-                UploadDTO u = uploadUtil.upload(i,path);
+                UploadDTO u = uploadUtil.upload(i,path,false);
                 AttachmentFile attachmentFile = AttachmentFile.builder()
                         .fileName(u.getFileName())
-                        .filePath(path)
+                        .filePath(s3url+path)
                         .originalFileName(u.getOriginalName())
                         .userBusinessLicense(user)
                         .build();
@@ -137,10 +138,10 @@ public class UserService {
                     attachmentFileRepository.delete(a);
                 }
             }for (MultipartFile i: businessLicense){
-                UploadDTO u = uploadUtil.upload(i,path);
+                UploadDTO u = uploadUtil.upload(i,path,false);
                 AttachmentFile attachmentFile = AttachmentFile.builder()
                         .fileName(u.getFileName())
-                        .filePath(path)
+                        .filePath(s3url+path)
                         .originalFileName(u.getOriginalName())
                         .userBusinessLicense(user.get())
                         .build();
@@ -399,10 +400,10 @@ public class UserService {
             }
         }
         for (MultipartFile i: additionalData){
-            UploadDTO u = uploadUtil.upload(i,path);
+            UploadDTO u = uploadUtil.upload(i,path,false);
             AttachmentFile attachmentFile = AttachmentFile.builder()
                     .fileName(u.getFileName())
-                    .filePath(path)
+                    .filePath(s3url+path)
                     .originalFileName(u.getOriginalName())
                     .userAdditionalData(user.get())
                     .build();
