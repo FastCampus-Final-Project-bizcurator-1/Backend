@@ -132,7 +132,7 @@ public class UserService {
             if(!(user.get().getBusinessLicense()==null || user.get().getBusinessLicense().isEmpty())) {
                 //업로드 파일이 있을시 저장된 파일 삭제 / 업로드할 파일 등록
                 for (AttachmentFile a : user.get().getBusinessLicense()) {
-                    uploadUtil.deleteFile(a.getFileName(), path);
+                    uploadUtil.deleteFile(a.getFileName(), path,false);
                     a.setUserBusinessLicense(null);
                     attachmentFileRepository.save(a);
                     attachmentFileRepository.delete(a);

@@ -14,35 +14,35 @@ import project.finalproject1backend.util.UploadUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-@RequestMapping("/upload/")
-@RestController
-public class UploadController {
-    UploadUtil attachmentUtil =new UploadUtil();
-//    String path= "/home/ubuntu/FinalProject/upload/test";
-    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
-    @Operation(summary = "upload 메서드", description = "업로드 메서드입니다. /home/ubuntu/FinalProject/upload/test, /home/ubuntu/FinalProject/upload/users")
-    @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> upload(@RequestPart MultipartFile[] multipartFiles ,@RequestParam String path){
-
-        List<UploadDTO> result = new ArrayList<>();
-        for (MultipartFile i: multipartFiles){
-            result.add(attachmentUtil.upload(i,path,false));
-
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
-    @Operation(summary = "view 메서드", description = "view 메서드입니다.")
-    @GetMapping("/view/{fileName}")
-    public ResponseEntity<?> viewFile(@PathVariable String fileName,@RequestParam String path){
-       return attachmentUtil.viewFile(fileName,path);
-    }
-
-    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
-    @Operation(summary = "delete 메서드", description = "delete 메서드입니다.")
-    @DeleteMapping("/remove/{fileName}")
-    public Map<String,Boolean> deleteFile(@PathVariable String fileName,@RequestParam String path){
-        return attachmentUtil.deleteFile(fileName,path);
-    }
-}
+//@RequestMapping("/upload/")
+//@RestController
+//public class UploadController {
+//    UploadUtil attachmentUtil =new UploadUtil();
+////    String path= "/home/ubuntu/FinalProject/upload/test";
+//    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
+//    @Operation(summary = "upload 메서드", description = "업로드 메서드입니다. /home/ubuntu/FinalProject/upload/test, /home/ubuntu/FinalProject/upload/users")
+//    @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> upload(@RequestPart MultipartFile[] multipartFiles ,@RequestParam String path){
+//
+//        List<UploadDTO> result = new ArrayList<>();
+//        for (MultipartFile i: multipartFiles){
+//            result.add(attachmentUtil.upload(i,path,false));
+//
+//        }
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
+//
+//    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
+//    @Operation(summary = "view 메서드", description = "view 메서드입니다.")
+//    @GetMapping("/view/{fileName}")
+//    public ResponseEntity<?> viewFile(@PathVariable String fileName,@RequestParam String path){
+//       return attachmentUtil.viewFile(fileName,path);
+//    }
+//
+//    @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
+//    @Operation(summary = "delete 메서드", description = "delete 메서드입니다.")
+//    @DeleteMapping("/remove/{fileName}")
+//    public Map<String,Boolean> deleteFile(@PathVariable String fileName,@RequestParam String path){
+//        return attachmentUtil.deleteFile(fileName,path,false);
+//    }
+//}

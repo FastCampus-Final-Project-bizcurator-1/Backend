@@ -57,37 +57,37 @@ public class UploadUtil {
     }
 
     //파일 조회
-    public ResponseEntity<?> viewFile(String fileName,String path){
-        Resource resource = new FileSystemResource(path+File.separator+fileName);
-        String resourceName = resource.getFilename();
-        HttpHeaders headers = new HttpHeaders();
+//    public ResponseEntity<?> viewFile(String fileName,String path){
+//        Resource resource = new FileSystemResource(path+File.separator+fileName);
+//        String resourceName = resource.getFilename();
+//        HttpHeaders headers = new HttpHeaders();
+//
+//        try{
+//            headers.add("Content-Type",Files.probeContentType(resource.getFile().toPath()));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return ResponseEntity.ok().headers(headers).body(resource);
+//    }
 
-        try{
-            headers.add("Content-Type",Files.probeContentType(resource.getFile().toPath()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return ResponseEntity.ok().headers(headers).body(resource);
-    }
-
-    public Map<String,Boolean> deleteFile(String fileName,String path){
-        Resource resource = new FileSystemResource(path+File.separator+fileName);
-        String resourceName = resource.getFilename();
-        Map<String,Boolean> resultMap = new HashMap<>();
-        boolean removed = false;
+    public boolean deleteFile(String fileName,String path,boolean hasThumb){
+//        Resource resource = new FileSystemResource(path+File.separator+fileName);
+//        String resourceName = resource.getFilename();
+//        Map<String,Boolean> resultMap = new HashMap<>();
+//        boolean removed = false;
         try {
-            String contentType = Files.probeContentType(resource.getFile().toPath());
-            removed = resource.getFile().delete();
+//            String contentType = Files.probeContentType(resource.getFile().toPath());
+//            removed = resource.getFile().delete();
             //이미지 파일이면 썸네일 파일도 생성
-            if(contentType.startsWith("image")){
-                File thumbFile = new File(path+File.separator+"s_"+fileName);
-                thumbFile.delete();
+            awsS3.delete(path+fileName);
+            if(hasThumb==true){
+                awsS3.delete(path+"s_"+fileName);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        resultMap.put("result",removed);
-        return resultMap;
+//        resultMap.put("result",removed);
+        return true;
     }
 
 }
