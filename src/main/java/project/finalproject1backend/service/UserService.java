@@ -42,13 +42,11 @@ public class UserService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-//    private String path = "C:\\upload";  //로컬 테스트용
     private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
 
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO, List<MultipartFile> businessLicense){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
             throw new IllegalArgumentException("existId");
-//            return new ResponseEntity<>(new ErrorDTO  ("400","existId"), HttpStatus.BAD_REQUEST);
         }
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.ROLE_STANDBY);
@@ -83,12 +81,10 @@ public class UserService {
     public ResponseEntity<?> login(UserLoginRequestDTO requestDTO) {
         if(!userRepository.existsByUserId(requestDTO.getUserId())) {
             throw new IllegalArgumentException("checkId");
-//            return new ResponseEntity<>(new ErrorDTO("400","checkId"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user = userRepository.findByUserId(requestDTO.getUserId());
         if(!passwordEncoder.matches(requestDTO.getPassword(),user.get().getPassword() )){
             throw new IllegalArgumentException("checkPassword");
-//            return new ResponseEntity<>(new ErrorDTO("400","checkPassword"), HttpStatus.BAD_REQUEST);
         }
         String token = jwtTokenProvider.createToken(user.get().getUserId());
         return new ResponseEntity<>(new UserLoginResponseDTO("200",token),HttpStatus.OK);
@@ -125,7 +121,6 @@ public class UserService {
     public ResponseEntity<?> modifyLicense(PrincipalDTO principal, UserModifyLicenseRequestDTO modifyRequestDTO,List<MultipartFile> businessLicense) {
         if(!modifyRequestDTO.nullCheck()){
             throw new IllegalArgumentException("checkNull");
-//            return new ResponseEntity<>(new ErrorDTO("400","checkNull"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user=userRepository.findById(principal.getId());
         user.get().setOwnerName(modifyRequestDTO.getOwnerName());
@@ -137,13 +132,10 @@ public class UserService {
                 //업로드 파일이 있을시 저장된 파일 삭제 / 업로드할 파일 등록
                 for (AttachmentFile a : user.get().getBusinessLicense()) {
                     uploadUtil.deleteFile(a.getFileName(), path);
-                    //getA().getListOfB.remove(getA().getListOfB().get(someIndex));
-//                    user.get().getBusinessLicense().remove(a);
                     a.setUserBusinessLicense(null);
                     attachmentFileRepository.save(a);
                     attachmentFileRepository.delete(a);
                 }
-//                attachmentFileRepository.deleteAllByUserBusinessLicense(user.get().getId());
             }for (MultipartFile i: businessLicense){
                 UploadDTO u = uploadUtil.upload(i,path);
                 AttachmentFile attachmentFile = AttachmentFile.builder()
@@ -158,9 +150,7 @@ public class UserService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-//    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
     public ResponseEntity<?> getUsers(Pageable pageable, String select, String value) {
-        // list로 주기
         Page<UserInfoResponseDTO> userPage = null;
         if(select==null) {
             userPage = userRepository.findAll(pageable).map(
