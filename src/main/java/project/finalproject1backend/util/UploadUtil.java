@@ -49,7 +49,7 @@ public class UploadUtil {
 //                Thumbnailator.createThumbnail(savePath.toFile(),thumbFile,200,200);
                 return new UploadDTO(uuid,originalName,fileName,"s_"+fileName);
             }
-
+            file.delete();
         } catch (IOException e) {
             e.printStackTrace();
         }
