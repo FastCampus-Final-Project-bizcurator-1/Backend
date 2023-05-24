@@ -1,5 +1,8 @@
 package project.finalproject1backend.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +24,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import project.finalproject1backend.jwt.JwtAccessDeniedHandler;
+import project.finalproject1backend.jwt.JwtAuthenticationEntryPoint;
+import project.finalproject1backend.jwt.JwtAuthenticationFilter;
+import project.finalproject1backend.jwt.JwtTokenProvider;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -28,9 +35,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-//    private final JwtTokenProvider jwtTokenProvider;
-//    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 //
 //    private final UserDetailsService userDetailsService;
 
@@ -61,6 +68,13 @@ public class SecurityConfig {
 
         return source;
     }
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("bearer-key",
+                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -87,17 +101,18 @@ public class SecurityConfig {
 //                .anyRequest().permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
-                .antMatchers("/", "/signup", "/login","/now").permitAll()
+                .antMatchers("/", "/signup", "/login","/upload/*","/upload/view/*",
+                        "/upload/remove/*","/sendEmail","/sendEmail/confirm","/findUserIdByManagerName","/findUserIdByManagerName/confirm",
+                        "/setRandomPassword/confirm","/setRandomPassword","/signup/checkId").permitAll()
 
-//                .requestMatchers("/schedule/admin/**", "/account/admin/**").hasRole("ADMIN")
-//                .requestMatchers(HttpMethod.POST, "/schedule/**", "/account/**").hasAnyRole("USER","ADMIN")
+                .antMatchers("/account/**").hasAnyRole("STANDBY","USER", "ADMIN")
+
                 .anyRequest().authenticated()
-//                .and()
-//                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-//
-//                .exceptionHandling()
-//                .authenticationEntryPoint(jwtAuthenticationEntryPoint) //  401 UNAUTHORIZED
-//                .accessDeniedHandler(jwtAccessDeniedHandler) // 403 FORBIDDEN
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint) //  401 UNAUTHORIZED
+                .accessDeniedHandler(jwtAccessDeniedHandler) // 403 FORBIDDEN
                 .and().build();
     }
 
